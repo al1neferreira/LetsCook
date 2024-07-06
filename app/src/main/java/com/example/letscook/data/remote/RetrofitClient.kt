@@ -1,4 +1,4 @@
-package com.example.letscook
+package com.example.letscook.data.remote
 
 import com.example.letscook.util.Constants
 import okhttp3.OkHttpClient
