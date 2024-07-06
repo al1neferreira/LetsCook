@@ -1,5 +1,6 @@
 package com.example.letscook.model.recipe
 
+@kotlinx.serialization.Serializable
 data class RecipeDto(
     val id: Int,
     val title: String,
