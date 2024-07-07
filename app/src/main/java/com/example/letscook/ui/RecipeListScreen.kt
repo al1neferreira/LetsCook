@@ -1,5 +1,6 @@
 package com.example.letscook.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -25,7 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.letscook.data.remote.RecipeService
+import com.example.letscook.data.remote.RetrofitClient
 import com.example.letscook.model.recipe.RecipeDto
+import com.example.letscook.model.recipe.RecipeResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 @Composable
@@ -33,6 +40,32 @@ fun RecipeListScreen() {
 
     var randomRecipes by remember { mutableStateOf<List<RecipeDto>>(emptyList()) }
 
+    val apiService = RetrofitClient.retrofitInstance.create(RecipeService::class.java)
+    val callRandomRecipes = apiService.getRandomRecipes()
+
+    callRandomRecipes.enqueue(object : Callback<RecipeResponse>{
+        override fun onResponse(
+            call: Call<RecipeResponse>,
+            response: Response<RecipeResponse>
+        ) {
+            if (response.isSuccessful) {
+                val recipes = response.body()?.recipes
+                if (recipes != null) {
+                    randomRecipes = recipes
+                    Log.d("MainActivity", "${response.body()}")
+                }
+            } else {
+                Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+            }
+        }
+
+        override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
+            Log.d("MainActivity", "Network Error :: ${t.message}")
+        }
+    })
+
+    RecipeListContent(randomRecipes = randomRecipes) {
+    }
 }
 
 @Composable
